@@ -10,7 +10,7 @@ impl PartialEq for Color {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Color {
     pub red: f64,
     pub green: f64,
@@ -87,10 +87,10 @@ impl Canvas {
         Canvas { width, height, pixels: vec![Color::black(); width * height] }
     }
 
-    pub fn pixel_at(&self, x: usize, y: usize) -> &Color {
+    pub fn pixel_at(&self, x: usize, y: usize) -> Color {
         // let index = x + self.width + y;
         // &self.pixels[index]
-        &self.pixels[self.get_pixel_index(x, y)]
+        self.pixels[self.get_pixel_index(x, y)]
     }
 
     pub fn write_color(&mut self, x: usize, y: usize, color: Color) {
@@ -191,7 +191,7 @@ mod tests {
 
         for x in 0..c.width - 1 {
             for y in 0..c.height -1 {
-                assert_eq!(*c.pixel_at(x, y), Color::black());
+                assert_eq!(c.pixel_at(x, y), Color::black());
             }
         }
     }
@@ -204,9 +204,10 @@ mod tests {
 
         c.write_color(2, 3, red);
 
-        let expected_result = Color::new(1.0, 0.0, 0.0);
+        // let expected_result = Color::new(1.0, 0.0, 0.0);
 
-        assert_eq!(expected_result, *c.pixel_at(2, 3));
+        // assert_eq!(expected_result, c.pixel_at(2, 3));
+        assert_eq!(red, c.pixel_at(2, 3));
 
     }
 
