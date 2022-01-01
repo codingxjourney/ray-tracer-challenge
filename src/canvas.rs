@@ -176,7 +176,7 @@ impl Canvas {
     }
  }
 
-trait ToPPM {
+pub trait ToPPM {
     fn to_ppm(&self) -> Vec<u8>;
 }
 
