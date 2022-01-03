@@ -6,10 +6,10 @@ pub type Matrix4f = [[f64; 4]; 4];
 
 impl FuzzyEq<Matrix2f> for Matrix2f {
     fn fuzzy_eq(&self, other: &Matrix2f) -> bool {
-        f64_fuzzy_eq(self[0][0], other[0][0]) 
-            && f64_fuzzy_eq(self[0][1], other[0][1])
-            && f64_fuzzy_eq(self[1][0], other[1][0])
-            && f64_fuzzy_eq(self[1][1], other[1][1])
+        self[0][0].fuzzy_eq(&other[0][0]) 
+            && self[0][1].fuzzy_eq(&other[0][1])
+            && self[1][0].fuzzy_eq(&other[1][0])
+            && self[1][1].fuzzy_eq(&other[1][1])
     }
 }
 
