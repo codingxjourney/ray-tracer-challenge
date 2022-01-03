@@ -14,7 +14,7 @@ impl FuzzyEq<f64> for f64 {
     }
 }
 
-// we don't need this function any more 
+// we don't need this function any more
 // pub fn f64_fuzzy_eq(left: f64, right: f64) -> bool {
 //     (left - right).abs() < EPSILON
 // }
@@ -35,6 +35,22 @@ macro_rules! assert_fuzzy_eq {
         }
     });
 }
+
+#[macro_export]
+macro_rules! assert_fuzzy_ne {
+    ($left:expr, $right:expr $(,)?) => ({
+        match (&$left, &$right) {
+            (left_val, right_val) => {
+                if left_val.fuzzy_eq(right_val) {
+                    panic!("asserting, fuzzy in-equality, {:?} is fuzzy equal to {:?}", left_val, right_val);
+                }
+            }
+        }
+    });
+}
+
+
+
     // ($left:expr, $right:expr, $($arg:tt)+) => ({
     //     match (&$left, &$right) {
     //         (left_val, right_val) => {
