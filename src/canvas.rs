@@ -1,12 +1,14 @@
 use std::ops::{Add, Sub, Mul, Div};
-use std::cmp::PartialEq;
+// use std::cmp::PartialEq;
 use std::vec::Vec;
 
 use super::fuzzy_eq::*;
 
-impl PartialEq for Color {
-    fn eq(&self, other: &Self) -> bool {
-        f64_fuzzy_eq(self.red, other.red) && f64_fuzzy_eq(self.green, other.green) && f64_fuzzy_eq(self.blue, other.blue)
+impl FuzzyEq<Color> for Color {
+    fn fuzzy_eq(&self, other: &Self) -> bool {
+        self.red.fuzzy_eq(&other.red) 
+            && self.green.fuzzy_eq(&other.green) 
+            && self.blue.fuzzy_eq(&other.blue)
     }
 }
 
@@ -202,9 +204,9 @@ mod tests {
     fn colors_are_red_green_blue_tuple() {
         let c = Color::new(-0.5, 0.4, 1.7);
 
-        assert_eq!(c.red, -0.5);
-        assert_eq!(c.green, 0.4);
-        assert_eq!(c.blue, 1.7);
+        assert_fuzzy_eq!(c.red, -0.5);
+        assert_fuzzy_eq!(c.green, 0.4);
+        assert_fuzzy_eq!(c.blue, 1.7);
     }
 
     #[test]
@@ -215,7 +217,7 @@ mod tests {
         let expected_result = Color::new(1.4, 0.7, 1.0);
         let actual_result = c1 + c2;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -226,7 +228,7 @@ mod tests {
         let expected_result = Color::new(0.0, 0.1, 0.5);
         let actual_result = c1 - c2;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
         
     #[test]
@@ -237,7 +239,7 @@ mod tests {
         let expected_result = Color::new(3.5, -7.0, 10.5);
         let actual_result = a * multiplier_scalar;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -248,7 +250,7 @@ mod tests {
         let expected_result = Color::new(0.8, 0.4, 0.07);
         let actual_result = c1 * c2;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -259,7 +261,7 @@ mod tests {
         let expected_result = Color::new(0.5, -1.0, 1.5);
         let actual_result = a / divisor_scalar;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -270,7 +272,17 @@ mod tests {
         let expected_result = Color::new(0.25, 0.5, 10.0);
         let actual_result = c1 / c2;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
+    }
+
+    #[test]
+    fn clampimg_colors() {
+        let c = Color::new(2.3, -6.7, 0.8);
+
+        let expected_result = Color::new(1.0, 0.0, 0.8);
+        let actual_result = c.clamp(0.0, 1.0);
+
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -282,19 +294,9 @@ mod tests {
 
         for x in 0..c.width - 1 {
             for y in 0..c.height -1 {
-                assert_eq!(c.pixel_at(x, y), Color::black());
+                assert_fuzzy_eq!(c.pixel_at(x, y), Color::black());
             }
         }
-    }
-
-    #[test]
-    fn clampimg_colors() {
-        let c = Color::new(2.3, -6.7, 0.8);
-
-        let expected_result = Color::new(1.0, 0.0, 0.8);
-        let actual_result = c.clamp(0.0, 1.0);
-
-        assert_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -308,7 +310,7 @@ mod tests {
         // let expected_result = Color::new(1.0, 0.0, 0.0);
 
         // assert_eq!(expected_result, c.pixel_at(2, 3));
-        assert_eq!(red, c.pixel_at(2, 3));
+        assert_fuzzy_eq!(red, c.pixel_at(2, 3));
 
     }
     

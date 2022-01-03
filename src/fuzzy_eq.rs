@@ -14,9 +14,10 @@ impl FuzzyEq<f64> for f64 {
     }
 }
 
-pub fn f64_fuzzy_eq(left: f64, right: f64) -> bool {
-    (left - right).abs() < EPSILON
-}
+// we don't need this function any more 
+// pub fn f64_fuzzy_eq(left: f64, right: f64) -> bool {
+//     (left - right).abs() < EPSILON
+// }
 
 
 // Not really sure what I am doing here, as I don't have a great understanding
