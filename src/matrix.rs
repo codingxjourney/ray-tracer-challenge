@@ -13,6 +13,41 @@ impl FuzzyEq<Matrix2f> for Matrix2f {
     }
 }
 
+impl FuzzyEq<Matrix3f> for Matrix3f {
+    fn fuzzy_eq(&self, other: &Matrix3f) -> bool {
+        self[0][0].fuzzy_eq(&other[0][0])
+            && self[0][1].fuzzy_eq(&other[0][1])
+            && self[0][2].fuzzy_eq(&other[0][2])
+            && self[1][0].fuzzy_eq(&other[1][0])
+            && self[1][1].fuzzy_eq(&other[1][1])
+            && self[1][2].fuzzy_eq(&other[1][2])
+            && self[2][0].fuzzy_eq(&other[2][0])
+            && self[2][1].fuzzy_eq(&other[2][1])
+            && self[2][2].fuzzy_eq(&other[2][2])
+    }
+}
+
+impl FuzzyEq<Matrix4f> for Matrix4f {
+    fn fuzzy_eq(&self, other: &Matrix4f) -> bool {
+        self[0][0].fuzzy_eq(&other[0][0])
+            && self[0][1].fuzzy_eq(&other[0][1])
+            && self[0][2].fuzzy_eq(&other[0][2])
+            && self[0][3].fuzzy_eq(&other[0][3])
+            && self[1][0].fuzzy_eq(&other[1][0])
+            && self[1][1].fuzzy_eq(&other[1][1])
+            && self[1][2].fuzzy_eq(&other[1][2])
+            && self[1][3].fuzzy_eq(&other[1][3])
+            && self[2][0].fuzzy_eq(&other[2][0])
+            && self[2][1].fuzzy_eq(&other[2][1])
+            && self[2][2].fuzzy_eq(&other[2][2])
+            && self[2][3].fuzzy_eq(&other[2][3])
+            && self[3][0].fuzzy_eq(&other[3][0])
+            && self[3][1].fuzzy_eq(&other[3][1])
+            && self[3][2].fuzzy_eq(&other[3][2])
+            && self[3][3].fuzzy_eq(&other[3][3])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -70,7 +105,7 @@ mod tests {
     }
 
     #[test]
-    fn matrix_fuzzy_equality_with_identical_2x2_matrices() {
+    fn matrix_equality_with_identical_2x2_matrices() {
         let matrix1 = [[0.123456789, 1.0], [2.0, 3.0]];
         let matrix2 = [[0.123456788, 1.0], [2.0, 3.0]];
 
@@ -79,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn matrix_fuzzy_equality_with_almost_cidentical_2x2_matrices() {
+    fn matrix_equality_with_almost_identical_2x2_matrices() {
         let matrix1 = [[0.123456789, 1.0], [2.0, 3.0]];
         let matrix2 = [[0.123456780, 1.0], [2.0, 3.0]];
 
@@ -87,4 +122,78 @@ mod tests {
         // assert!(matrix1.fuzzy_eq(&matrix2));
 
     }
+
+    #[test]
+    fn matrix_equality_with_identical_3x3_matrices() {
+        let matrix1 = [[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]];
+        let matrix2 = [[0.123456780, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]];
+
+        assert_fuzzy_eq!(matrix1, matrix2);
+    }
+
+    #[test]
+    fn matrix_equality_with_almost_identical_3x3_matrices() {
+        let matrix1 = [[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]];
+        let matrix2 = [[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777]];
+
+        assert_fuzzy_eq!(matrix1, matrix2);
+    }
+
+    #[test]
+    fn matrix_equality_with_identical_4x4_matrices() {
+        let matrix1 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777777, 23.5],
+            [0.0, 0.0, 0.0, 1.0],
+        ];
+
+        let matrix2 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777777, 23.5],
+            [0.0, 0.0, 0.0, 1.0],
+        ];
+
+        assert_fuzzy_eq!(matrix1, matrix2);
+    }
+
+    #[test]
+    fn matrix_equality_with_almost_identical_4x4_matrices() {
+        let matrix1 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777777, 23.5],
+            [0.0, 0.0, 0.0, 1.0000000000001],
+        ];
+
+        let matrix2 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777, 23.5],
+            [0.0, 0.0, 0.0, 1.0],
+        ];
+
+        assert_fuzzy_eq!(matrix1, matrix2);
+    }
+
+    #[test]
+    fn matrix_inequality_with_non_identical_4x4_matrices() {
+        let matrix1 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777777, 23.5],
+            [0.0, 0.0, 0.0, 1.0],
+        ];
+        let matrix2 = [
+            [0.123456789, 1.0, 2.0, 42.0],
+            [2.0, 3.0, 4.0, -42.0],
+            [5.0, 6.0, 7.7777777777777777, 23.5],
+            [0.0, 0.0, 0.0, 2.0],
+        ];
+
+        assert_fuzzy_ne!(matrix1, matrix2);
+    }
+
+    
 }
