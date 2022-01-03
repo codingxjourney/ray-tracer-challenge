@@ -34,9 +34,12 @@ impl Tuple {
 
 // TODO: may be implement own FazzyPartialEq trait in the future combined with 
 //  assert_fazzy_eq! macro, would be a lot nicer 
-impl PartialEq<Tuple> for Tuple {
-    fn eq(&self, other: &Self) -> bool {
-        f64_fuzzy_eq(self.x, other.x) && f64_fuzzy_eq(self.y, other.y) && f64_fuzzy_eq(self.z, other.z) && f64_fuzzy_eq(self.w, other.w)
+impl FuzzyEq<Tuple> for Tuple {
+    fn fuzzy_eq(&self, other: &Self) -> bool {
+        self.x.fuzzy_eq(&other.x) 
+            && self.y.fuzzy_eq(&other.y) 
+            && self.z.fuzzy_eq(&other.z) 
+            && self.w.fuzzy_eq(&other.w)
     }
 }
 
@@ -117,15 +120,15 @@ mod tests {
     fn point_does_fill_properties() {
         let point = Tuple::point(4.3, -4.2, 3.1);
 
-        assert_eq!(point.x, 4.3);
-        assert_eq!(point.y, -4.2);
-        assert_eq!(point.z, 3.1);
+        assert_fuzzy_eq!(point.x, 4.3);
+        assert_fuzzy_eq!(point.y, -4.2);
+        assert_fuzzy_eq!(point.z, 3.1);
     }
     
     #[test]
     fn point_has_w_value_of_one() {
         let point = Tuple::point(4.3, -4.2, 3.1);
-        assert_eq!(point.w, 1.0);
+        assert_fuzzy_eq!(point.w, 1.0);
     }
 
     #[test]
@@ -140,7 +143,7 @@ mod tests {
         let tuple_two = Tuple::new(-2.0, 3.0, 3.0, 0.0);
         let expected_tuple = Tuple::new(1.0, 1.0, 6.0, 1.0);
 
-        assert_eq!(tuple_one + tuple_two, expected_tuple);
+        assert_fuzzy_eq!(tuple_one + tuple_two, expected_tuple);
     }
 
     #[test]
@@ -152,7 +155,7 @@ mod tests {
         let actual_result = point_one - point_two;
 
         assert!(actual_result.is_vector());
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -164,7 +167,7 @@ mod tests {
         let actual_result = p - v;
 
         assert!(actual_result.is_point());
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -176,7 +179,7 @@ mod tests {
         let actual_result = v1 - v2;
 
         assert!(actual_result.is_vector());
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -188,7 +191,7 @@ mod tests {
         let actual_result = zero - v1;
 
         assert!(actual_result.is_vector());
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -198,7 +201,7 @@ mod tests {
         let expected_result = Tuple::new(-1.0, 2.0, -3.0, 4.0);
         let actual_result = -v;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -209,7 +212,7 @@ mod tests {
         let expected_result = Tuple::new(3.5, -7.0, 10.5, -14.0);
         let actual_result = a * multiplier_scalar;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -220,7 +223,7 @@ mod tests {
         let expected_result = Tuple::new(0.5, -1.0, 1.5, -2.0);
         let actual_result = a * fraction;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -231,7 +234,7 @@ mod tests {
         let expected_result = Tuple::new(0.5, -1.0, 1.5, -2.0);
         let actual_result = a / divisor_scalar;
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
     
     #[test]
@@ -241,7 +244,7 @@ mod tests {
         let expected_result = 1.0;
         let actual_result = v.magnitude();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -251,7 +254,7 @@ mod tests {
         let expected_result = 1.0;
         let actual_result = v.magnitude();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -261,7 +264,7 @@ mod tests {
         let expected_result = 1.0;
         let actual_result = v.magnitude();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -271,7 +274,7 @@ mod tests {
         let expected_result = v.magnitude();
         let actual_result = (14.0 as f64).sqrt();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -281,7 +284,7 @@ mod tests {
         let expected_result = v.magnitude();
         let actual_result = (14.0 as f64).sqrt();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -291,7 +294,7 @@ mod tests {
         let expected_result = Tuple::vector(1.0, 0.0, 0.0);
         let actual_result = v.normalize();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -301,7 +304,7 @@ mod tests {
         let expected_result = Tuple::vector(0.26726, 0.53452, 0.80178);
         let actual_result = v.normalize();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -311,7 +314,7 @@ mod tests {
         let expected_result = 1.0;
         let actual_result = v.normalize().magnitude();
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -322,7 +325,7 @@ mod tests {
         let expected_result = 20.0;
         let actual_result = x.dot(&y);
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 
     #[test]
@@ -333,7 +336,7 @@ mod tests {
         let expected_result = Tuple::vector(-1.0, 2.0, -1.0);
         let actual_result = x.cross(&y);
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }    
 
     #[test]
@@ -344,7 +347,7 @@ mod tests {
         let expected_result = Tuple::vector(1.0, -2.0, 1.0);
         let actual_result = y.cross(&x);
 
-        assert_eq!(actual_result, expected_result);
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 }
 
