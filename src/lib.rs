@@ -1,5 +1,5 @@
 #[macro_use]
-mod util;
+mod fuzzy_eq;
 
 pub mod tuple;
 pub mod canvas;

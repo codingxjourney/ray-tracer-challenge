@@ -1,4 +1,4 @@
-use crate::util::*;
+use crate::fuzzy_eq::*;
 
 pub type Matrix2f = [[f64; 2]; 2];
 pub type Matrix3f = [[f64; 3]; 3];

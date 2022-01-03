@@ -2,7 +2,7 @@ use std::ops::{Add, Sub, Mul, Div};
 use std::cmp::PartialEq;
 use std::vec::Vec;
 
-use super::util::*;
+use super::fuzzy_eq::*;
 
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {

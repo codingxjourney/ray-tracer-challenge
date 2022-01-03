@@ -1,6 +1,6 @@
 use std::ops;
 
-use super::util::*;
+use super::fuzzy_eq::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Tuple {
