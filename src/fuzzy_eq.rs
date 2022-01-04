@@ -22,7 +22,7 @@ impl FuzzyEq<f64> for f64 {
 
 // Not really sure what I am doing here, as I don't have a great understanding
 // of macros yet! But I will fix and understand in future.
-
+// @TODO Check if we can ensure more explicitly the two operands the "FuzzyEq" trait
 #[macro_export]
 macro_rules! assert_fuzzy_eq {
     ($left:expr, $right:expr $(,)?) => ({
