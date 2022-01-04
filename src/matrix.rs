@@ -1,4 +1,6 @@
 use crate::fuzzy_eq::*;
+use crate::tuple::*;
+
 use std::convert::From;
 use std::ops::{Index, IndexMut, Mul};
 
@@ -188,6 +190,20 @@ impl Mul<Matrix4f> for Matrix4f {
     }
 }
 
+impl Mul<Tuple> for Matrix4f {
+    type Output = Tuple;
+
+    fn mul(self, other: Tuple) -> Self::Output {
+        Tuple::new(
+            self[0][0] * other.x + self[0][1] * other.y + self[0][2] * other.z + self[0][3] * other.w,
+            self[1][0] * other.x + self[1][1] * other.y + self[1][2] * other.z + self[1][3] * other.w,
+            self[2][0] * other.x + self[2][1] * other.y + self[2][2] * other.z + self[2][3] * other.w,
+            self[3][0] * other.x + self[3][1] * other.y + self[3][2] * other.z + self[3][3] * other.w,
+            
+        )
+    }
+}
+
 impl Mul<Matrix3f> for Matrix3f {
     type Output = Matrix3f;
 
@@ -223,6 +239,7 @@ impl Mul<Matrix2f> for Matrix2f {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
@@ -410,6 +427,23 @@ mod tests {
 
         let expected_result = matrix1;
         let actual_result = matrix1 * matrix2;
+
+        assert_fuzzy_eq!(actual_result, expected_result);
+    }
+
+    #[test]
+    fn a_4x4_matrix_multiplied_by_a_point() {
+        let matrix = Matrix4f::from([
+            [1.0, 2.0, 3.0, 4.0],
+            [2.0, 4.0, 4.0, 2.0],
+            [8.0, 6.0, 4.0, 1.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+
+        let point = Tuple::point(1.0, 2.0, 3.0);
+
+        let expected_result = Tuple::point(18.0, 24.0, 33.0);
+        let actual_result = matrix * point;
 
         assert_fuzzy_eq!(actual_result, expected_result);
     }
