@@ -1,6 +1,6 @@
 use crate::fuzzy_eq::*;
 use std::convert::From;
-use std::ops::Index;
+use std::ops::{Index, IndexMut, Mul};
 
 type Matrix2fArrayRow = [f64; 2];
 type Matrix3fArrayRow = [f64; 3];
@@ -9,6 +9,8 @@ type Matrix2fArray = [Matrix2fArrayRow; 2];
 type Matrix3fArray = [Matrix3fArrayRow; 3];
 type Matrix4fArray = [Matrix4fArrayRow; 4];
 
+// @TODO: refactor to utilize one Matrix struct is the future.
+// Are const templete parameters on option?
 
 #[derive(Debug)]
 pub struct Matrix2f {
@@ -23,6 +25,36 @@ pub struct Matrix3f {
 #[derive(Debug)]
 pub struct Matrix4f {
     data: Matrix4fArray,
+}
+
+impl Matrix4f {
+    fn new() -> Matrix4f {
+        Matrix4f::from([
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ])
+    }
+}
+
+impl Matrix3f {
+    fn _new() -> Matrix3f {
+        Matrix3f::from([
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+        ])
+    }
+}
+
+impl Matrix2f {
+    fn _new() -> Matrix2f {
+        Matrix2f::from([
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ])
+    }
 }
 
 impl From<Matrix2fArray> for Matrix2f {
@@ -67,7 +99,23 @@ impl Index<usize> for Matrix4f {
     }
 }
 
+impl IndexMut<usize> for Matrix4f {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
 
+impl IndexMut<usize> for Matrix3f {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
+
+impl IndexMut<usize> for Matrix2f {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
 
 impl FuzzyEq<Matrix2f> for Matrix2f {
     fn fuzzy_eq(&self, other: &Matrix2f) -> bool {
@@ -112,6 +160,25 @@ impl FuzzyEq<Matrix4f> for Matrix4f {
             && self[3][3].fuzzy_eq(&other[3][3])
     }
 }
+
+impl Mul<Matrix4f> for Matrix4f {
+    type Output = Matrix4f;
+
+    fn mul(self, other: Matrix4f) -> Self::Output {
+        let mut matrix = Matrix4f::new();
+        
+        for row in 0..4 {
+            for column in 0..4 {
+                matrix[row][column] = self[row][0] * other[0][column]
+                                    + self[row][1] * other[1][column]
+                                    + self[row][2] * other[2][column]
+                                    + self[row][3] * other[3][column];
+            }
+        }
+        matrix
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -260,5 +327,32 @@ mod tests {
         assert_fuzzy_ne!(matrix1, matrix2);
     }
 
-    
+    #[test]
+    fn multiplying_two_4x4_matrices() {
+        let matrix1 = Matrix4f::from([
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+
+        let matrix2 = Matrix4f::from([
+            [-2.0, 1.0, 2.0, 3.0],
+            [3.0, 2.0, 1.0, -1.0],
+            [4.0, 3.0, 6.0, 5.0],
+            [1.0, 2.0, 7.0, 8.0],
+        ]); 
+
+        let expected_result = Matrix4f::from([
+            [20.0, 22.0, 50.0, 48.0],
+            [44.0, 54.0, 114.0, 108.0],
+            [40.0, 58.0, 110.0, 102.0],
+            [16.0, 26.0, 46.0, 42.0],
+        ]);
+
+        let actual_result = matrix1 * matrix2;
+
+        assert_fuzzy_eq!(actual_result, expected_result);
+
+    }
 }
