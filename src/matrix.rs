@@ -12,23 +12,23 @@ type Matrix4fArray = [Matrix4fArrayRow; 4];
 // @TODO: refactor to utilize one Matrix struct is the future.
 // Are const templete parameters on option?
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Matrix2f {
     data: Matrix2fArray,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Matrix3f {
     data: Matrix3fArray,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Matrix4f {
     data: Matrix4fArray,
 }
 
 impl Matrix4f {
-    fn new() -> Matrix4f {
+    pub fn new() -> Matrix4f {
         Matrix4f::from([
             [0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 0.0],
@@ -36,10 +36,19 @@ impl Matrix4f {
             [0.0, 0.0, 0.0, 0.0],
         ])
     }
+
+    pub fn identity() -> Matrix4f {
+        Matrix4f::from([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+    }
 }
 
 impl Matrix3f {
-    fn _new() -> Matrix3f {
+    fn new() -> Matrix3f {
         Matrix3f::from([
             [0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0],
@@ -49,7 +58,7 @@ impl Matrix3f {
 }
 
 impl Matrix2f {
-    fn _new() -> Matrix2f {
+    fn new() -> Matrix2f {
         Matrix2f::from([
             [0.0, 0.0],
             [0.0, 0.0],
@@ -179,6 +188,38 @@ impl Mul<Matrix4f> for Matrix4f {
     }
 }
 
+impl Mul<Matrix3f> for Matrix3f {
+    type Output = Matrix3f;
+
+    fn mul(self, other: Matrix3f) -> Self::Output {
+        let mut matrix = Matrix3f::new();
+
+        for row in 0..3 {
+            for column in 0..3 {
+                matrix[row][column] = self[row][0] * other[0][column]
+                                    + self[row][1] * other[1][column]
+                                    + self[row][2] * other[2][column];
+            }
+        }
+        matrix
+    }
+}
+
+impl Mul<Matrix2f> for Matrix2f {
+    type Output = Matrix2f;
+
+    fn mul(self, other: Matrix2f) -> Self::Output {
+        let mut matrix = Matrix2f::new();
+
+        for row in 0..2 {
+            for column in 0..2 {
+                matrix[row][column] = self[row][0] * other[0][column]
+                                    + self[row][1] * other[1][column]
+            }
+        }
+        matrix
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -354,5 +395,22 @@ mod tests {
 
         assert_fuzzy_eq!(actual_result, expected_result);
 
+    }
+
+    #[test]
+    fn multiplying_4x4_matrix_by_identity_matrix() {
+        let matrix1 = Matrix4f::from([
+            [0.0, 1.0, 2.0, 4.0],
+            [1.0, 2.0, 4.0, 8.0],
+            [2.0, 4.0, 8.0, 16.0],
+            [4.0, 8.0, 16.0, 32.0],
+        ]);
+
+        let matrix2 = Matrix4f::identity();
+
+        let expected_result = matrix1;
+        let actual_result = matrix1 * matrix2;
+
+        assert_fuzzy_eq!(actual_result, expected_result);
     }
 }
