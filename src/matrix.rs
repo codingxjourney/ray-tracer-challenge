@@ -115,6 +115,29 @@ impl Matrix4f {
         determinant
     }
 
+    pub fn is_invertible(&self) -> bool {
+        self.determinant().fuzzy_ne(&0.0)
+    }
+
+    pub fn inverse(&self) -> Matrix4f {
+        if !self.is_invertible() {
+            panic!("Matrix is not invertible, but inverse was called!");
+        }
+
+        let mut matrix = Matrix4f::new();
+        let determinant = self.determinant();
+
+        for row in 0..4 {
+            for column in 0..4 {
+                let cofactor = self.cofactor(row, column);
+                
+                // transposed storage
+                matrix[column][row] = cofactor / determinant;
+            }
+        }
+
+        matrix
+    }
 }
 
 impl Matrix3f {
@@ -728,4 +751,66 @@ mod tests {
 
         assert_fuzzy_eq!(-4071.0, determinant);
     }
+
+    #[test]
+    fn testing_an_invertible_matrix_for_invertibility() {
+        let matrix = Matrix4f::from([
+            [6.0, 4.0, 4.0, 4.0],
+            [5.0, 5.0, 7.0, 6.0],
+            [4.0, -9.0, 3.0, -7.0],
+            [9.0, 1.0, 7.0, -6.0],
+        ]);
+
+        let determinant = matrix.determinant();
+
+        assert_fuzzy_eq!(-2120.0, determinant);
+        assert!(matrix.is_invertible());
+    }
+
+    #[test]
+    fn testing_an_noninvertible_matrix_for_invertibility() {
+        let matrix = Matrix4f::from([
+            [-4.0, 2.0, -2.0, -3.0],
+            [9.0, 6.0, 2.0, 6.0],
+            [0.0, -5.0, 1.0, -5.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]);
+
+        let determinant = matrix.determinant();
+
+        assert_fuzzy_eq!(0.0, determinant);
+        assert!(!matrix.is_invertible());
+    }
+
+    #[test]
+    fn calculating_the_inverse_of_a_4x4_matrix() {
+        let matrix = Matrix4f::from([
+            [-5.0, 2.0, 6.0, -8.0],
+            [1.0, -5.0, 1.0, 8.0],
+            [7.0, 7.0, -6.0, -7.0],
+            [1.0, -3.0, 7.0, 4.0],
+        ]);
+
+        let determinant = matrix.determinant();
+        let cofactor23 = matrix.cofactor(2, 3);
+        let cofactor32 = matrix.cofactor(3, 2);
+
+        let expected_result = Matrix4f::from([
+            [0.21805, 0.45113, 0.24060, -0.04511],
+            [-0.80827, -1.45677, -0.44361, 0.52068],
+            [-0.07895, -0.22368, -0.05263, 0.19737],
+            [-0.52256, -0.81391, -0.30075, 0.30639],
+        ]);
+
+        let actual_result = matrix.inverse();
+
+        assert_fuzzy_eq!(532.0, determinant);
+        assert_fuzzy_eq!(-160.0, cofactor23);
+        assert_fuzzy_eq!(-160.0 / 532.0, actual_result[3][2]);
+        assert_fuzzy_eq!(105.0, cofactor32);
+        assert_fuzzy_eq!(105.0 / 532.0, actual_result[2][3]);
+        assert_fuzzy_eq!(actual_result, expected_result);
+    }
+
+
 }
