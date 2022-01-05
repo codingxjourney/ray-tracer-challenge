@@ -61,7 +61,7 @@ impl Matrix4f {
 
     pub fn submatrix(&self, row: usize, column: usize) -> Matrix3f {
         let mut matrix = Matrix3f::new();
-        
+
         let mut source_row: usize = 0;
         let mut source_column: usize = 0;
         let mut target_row: usize = 0;
@@ -87,7 +87,6 @@ impl Matrix4f {
 
             source_row += 1;
             source_column = 0;
-
         }
         matrix
     }
@@ -95,11 +94,7 @@ impl Matrix4f {
 
 impl Matrix3f {
     fn new() -> Matrix3f {
-        Matrix3f::from([
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-        ])
+        Matrix3f::from([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
     }
 
     // @FIX_IT: Find a nicer way to do this.
@@ -136,14 +131,25 @@ impl Matrix3f {
 
         matrix
     }
+
+    pub fn minor(&self, row: usize, column: usize) -> f64 {
+        self.submatrix(row, column).determinant()
+    }
+
+    pub fn cofactor(&self, row: usize, column: usize) -> f64 {
+        let minor = self.minor(row, column);
+        if (row + column) % 2 == 0 {
+            // Even value
+            minor
+        } else {
+            -minor
+        }
+    }
 }
 
 impl Matrix2f {
     fn new() -> Matrix2f {
-        Matrix2f::from([
-            [0.0, 0.0],
-            [0.0, 0.0],
-        ])
+        Matrix2f::from([[0.0, 0.0], [0.0, 0.0]])
     }
 
     pub fn determinant(&self) -> f64 {
@@ -213,7 +219,7 @@ impl IndexMut<usize> for Matrix2f {
 
 impl FuzzyEq<Matrix2f> for Matrix2f {
     fn fuzzy_eq(&self, other: &Matrix2f) -> bool {
-        self[0][0].fuzzy_eq(&other[0][0]) 
+        self[0][0].fuzzy_eq(&other[0][0])
             && self[0][1].fuzzy_eq(&other[0][1])
             && self[1][0].fuzzy_eq(&other[1][0])
             && self[1][1].fuzzy_eq(&other[1][1])
@@ -260,13 +266,13 @@ impl Mul<Matrix4f> for Matrix4f {
 
     fn mul(self, other: Matrix4f) -> Self::Output {
         let mut matrix = Matrix4f::new();
-        
+
         for row in 0..4 {
             for column in 0..4 {
                 matrix[row][column] = self[row][0] * other[0][column]
-                                    + self[row][1] * other[1][column]
-                                    + self[row][2] * other[2][column]
-                                    + self[row][3] * other[3][column];
+                    + self[row][1] * other[1][column]
+                    + self[row][2] * other[2][column]
+                    + self[row][3] * other[3][column];
             }
         }
         matrix
@@ -278,11 +284,22 @@ impl Mul<Tuple> for Matrix4f {
 
     fn mul(self, other: Tuple) -> Self::Output {
         Tuple::new(
-            self[0][0] * other.x + self[0][1] * other.y + self[0][2] * other.z + self[0][3] * other.w,
-            self[1][0] * other.x + self[1][1] * other.y + self[1][2] * other.z + self[1][3] * other.w,
-            self[2][0] * other.x + self[2][1] * other.y + self[2][2] * other.z + self[2][3] * other.w,
-            self[3][0] * other.x + self[3][1] * other.y + self[3][2] * other.z + self[3][3] * other.w,
-            
+            self[0][0] * other.x
+                + self[0][1] * other.y
+                + self[0][2] * other.z
+                + self[0][3] * other.w,
+            self[1][0] * other.x
+                + self[1][1] * other.y
+                + self[1][2] * other.z
+                + self[1][3] * other.w,
+            self[2][0] * other.x
+                + self[2][1] * other.y
+                + self[2][2] * other.z
+                + self[2][3] * other.w,
+            self[3][0] * other.x
+                + self[3][1] * other.y
+                + self[3][2] * other.z
+                + self[3][3] * other.w,
         )
     }
 }
@@ -296,8 +313,8 @@ impl Mul<Matrix3f> for Matrix3f {
         for row in 0..3 {
             for column in 0..3 {
                 matrix[row][column] = self[row][0] * other[0][column]
-                                    + self[row][1] * other[1][column]
-                                    + self[row][2] * other[2][column];
+                    + self[row][1] * other[1][column]
+                    + self[row][2] * other[2][column];
             }
         }
         matrix
@@ -312,8 +329,8 @@ impl Mul<Matrix2f> for Matrix2f {
 
         for row in 0..2 {
             for column in 0..2 {
-                matrix[row][column] = self[row][0] * other[0][column]
-                                    + self[row][1] * other[1][column]
+                matrix[row][column] =
+                    self[row][0] * other[0][column] + self[row][1] * other[1][column]
             }
         }
         matrix
@@ -393,21 +410,36 @@ mod tests {
 
         assert_fuzzy_eq!(matrix1, matrix2);
         // assert!(matrix1.fuzzy_eq(&matrix2));
-
     }
 
     #[test]
     fn matrix_equality_with_identical_3x3_matrices() {
-        let matrix1 = Matrix3f::from([[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]]);
-        let matrix2 = Matrix3f::from([[0.123456780, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]]);
+        let matrix1 = Matrix3f::from([
+            [0.123456789, 1.0, 2.0],
+            [2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.77777777777777777],
+        ]);
+        let matrix2 = Matrix3f::from([
+            [0.123456780, 1.0, 2.0],
+            [2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.77777777777777777],
+        ]);
 
         assert_fuzzy_eq!(matrix1, matrix2);
     }
 
     #[test]
     fn matrix_equality_with_almost_identical_3x3_matrices() {
-        let matrix1 = Matrix3f::from([[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777777]]);
-        let matrix2 = Matrix3f::from([[0.123456789, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.77777777777777]]);
+        let matrix1 = Matrix3f::from([
+            [0.123456789, 1.0, 2.0],
+            [2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.77777777777777777],
+        ]);
+        let matrix2 = Matrix3f::from([
+            [0.123456789, 1.0, 2.0],
+            [2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.77777777777777],
+        ]);
 
         assert_fuzzy_eq!(matrix1, matrix2);
     }
@@ -482,7 +514,7 @@ mod tests {
             [3.0, 2.0, 1.0, -1.0],
             [4.0, 3.0, 6.0, 5.0],
             [1.0, 2.0, 7.0, 8.0],
-        ]); 
+        ]);
 
         let expected_result = Matrix4f::from([
             [20.0, 22.0, 50.0, 48.0],
@@ -494,7 +526,6 @@ mod tests {
         let actual_result = matrix1 * matrix2;
 
         assert_fuzzy_eq!(actual_result, expected_result);
-
     }
 
     #[test]
@@ -546,7 +577,7 @@ mod tests {
             [3.0, 0.0, 5.0, 5.0],
             [0.0, 8.0, 3.0, 8.0],
         ]);
-        
+
         let actual_result = matrix.traspose();
 
         assert_fuzzy_eq!(actual_result, expected_result);
@@ -554,10 +585,7 @@ mod tests {
 
     #[test]
     fn calculate_the_determinant_of_2x2_matrix() {
-        let matrix = Matrix2f::from([
-            [1.0, 5.0],
-            [-3.0, 2.0]
-        ]);
+        let matrix = Matrix2f::from([[1.0, 5.0], [-3.0, 2.0]]);
 
         let expected_result = 17.0;
 
@@ -568,16 +596,9 @@ mod tests {
 
     #[test]
     fn submatrix_of_a_3x3_matrix_is_a_2x2_matrix() {
-        let matrix = Matrix3f::from([
-            [1.0, 5.0, 0.0],
-            [-3.0, 2.0, 7.0],
-            [0.0, 6.0, 3.0],
-        ]);
+        let matrix = Matrix3f::from([[1.0, 5.0, 0.0], [-3.0, 2.0, 7.0], [0.0, 6.0, 3.0]]);
 
-        let expected_result = Matrix2f::from([
-            [-3.0, 2.0],
-            [0.0, 6.0],
-        ]);
+        let expected_result = Matrix2f::from([[-3.0, 2.0], [0.0, 6.0]]);
 
         let actual_result = matrix.submatrix(0, 2);
 
@@ -593,15 +614,39 @@ mod tests {
             [-7.0, 1.0, -1.0, 1.0],
         ]);
 
-        let expected_result = Matrix3f::from([
-            [-6.0, 1.0, 6.0],
-            [-8.0, 8.0, 6.0],
-            [-7.0, -1.0, 1.0],
-        ]);
+        let expected_result =
+            Matrix3f::from([[-6.0, 1.0, 6.0], [-8.0, 8.0, 6.0], [-7.0, -1.0, 1.0]]);
 
         let actual_result = matrix.submatrix(2, 1);
 
         assert_fuzzy_eq!(actual_result, expected_result);
     }
 
+    #[test]
+    fn calculate_the_minor_of_3x3_matrix() {
+        let matrix = Matrix3f::from([[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, -1.0, 5.0]]);
+
+        let sub = matrix.submatrix(1, 0);
+        let determinant = sub.determinant();
+        let minor = matrix.minor(1, 0);
+
+        assert_fuzzy_eq!(25.0, determinant);
+        assert_fuzzy_eq!(25.0, minor);
+    }
+
+    #[test]
+    fn calculating_a_cofactor_of_a_3x3_matrix() {
+        let matrix = Matrix3f::from([[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, -1.0, 5.0]]);
+
+        let minor1 = matrix.minor(0, 0);
+        let minor2 = matrix.minor(1, 0);
+
+        let cofactor1 = matrix.cofactor(0, 0);
+        let cofactor2 = matrix.cofactor(1, 0);
+
+        assert_fuzzy_eq!(-12.0, minor1);
+        assert_fuzzy_eq!(-12.0, cofactor1);
+        assert_fuzzy_eq!(25.0, minor2);
+        assert_fuzzy_eq!(-25.0, cofactor2);
+    }
 }
