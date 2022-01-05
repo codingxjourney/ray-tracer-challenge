@@ -47,6 +47,17 @@ impl Matrix4f {
             [0.0, 0.0, 0.0, 1.0],
         ])
     }
+
+    pub fn traspose(self) -> Matrix4f {
+        let mut matrix = Matrix4f::new();
+
+        for row in 0..4 {
+            for column in 0..4 {
+                matrix[row][column] = self[column][row];
+            }
+        }
+        matrix
+    }
 }
 
 impl Matrix3f {
@@ -444,6 +455,27 @@ mod tests {
 
         let expected_result = Tuple::point(18.0, 24.0, 33.0);
         let actual_result = matrix * point;
+
+        assert_fuzzy_eq!(actual_result, expected_result);
+    }
+
+    #[test]
+    fn transposing_4x4_matrix() {
+        let matrix = Matrix4f::from([
+            [0.0, 9.0, 3.0, 0.0],
+            [9.0, 8.0, 0.0, 8.0],
+            [1.0, 8.0, 5.0, 3.0],
+            [0.0, 0.0, 5.0, 8.0],
+        ]);
+
+        let expected_result = Matrix4f::from([
+            [0.0, 9.0, 1.0, 0.0],
+            [9.0, 8.0, 8.0, 0.0],
+            [3.0, 0.0, 5.0, 5.0],
+            [0.0, 8.0, 3.0, 8.0],
+        ]);
+        
+        let actual_result = matrix.traspose();
 
         assert_fuzzy_eq!(actual_result, expected_result);
     }
