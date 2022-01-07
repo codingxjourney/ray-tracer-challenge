@@ -1,40 +1,41 @@
 use std::ops;
+use num_traits::Float;
 
 use super::fuzzy_eq::*;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Tuple {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-    pub w: f64,
+pub struct Tuple<T> where T: Float {
+    pub x: T,
+    pub y: T,
+    pub z: T,
+    pub w: T,
 }
 
 // Tuple type related functions
-impl Tuple {
-    pub fn new(x: f64, y: f64, z: f64, w: f64) -> Self {
+impl<T> Tuple<T> where T: Float {
+    pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
     }
     #[allow(dead_code)]
-    pub fn point(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z, w: 1.0 }
+    pub fn point(x: T, y: T, z: T) -> Self {
+        Self { x, y, z, w: T::one() }
     }
-    pub fn vector(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z, w: 0.0 }
+    pub fn vector(x: T, y: T, z: T) -> Self {
+        Self { x, y, z, w: T::zero() }
     }
     #[allow(dead_code)]
     pub fn is_point(&self) -> bool {
-        self.w == 1.0
+        self.w == T::one()
     }
     #[allow(dead_code)]
     pub fn is_vector(&self) -> bool {
-        self.w == 0.0
+        self.w == T::zero()
     }
 }
 
 // TODO: may be implement own FazzyPartialEq trait in the future combined with 
 //  assert_fazzy_eq! macro, would be a lot nicer 
-impl FuzzyEq<Tuple> for Tuple {
+impl<T> FuzzyEq<Tuple<T>> for Tuple<T> where T: Float, T: FuzzyEq<T> {
     fn fuzzy_eq(&self, other: &Self) -> bool {
         self.x.fuzzy_eq(&other.x) 
             && self.y.fuzzy_eq(&other.y) 
@@ -43,7 +44,7 @@ impl FuzzyEq<Tuple> for Tuple {
     }
 }
 
-impl ops::Add<Self> for Tuple {
+impl<T> ops::Add<Self> for Tuple<T> where T: Float {
     type Output = Self;
     
     fn add(self, other: Self) -> Self::Output {
@@ -51,7 +52,7 @@ impl ops::Add<Self> for Tuple {
     }
 }
 
-impl ops::Sub<Self> for Tuple {
+impl<T> ops::Sub<Self> for Tuple<T> where T: Float {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
@@ -59,7 +60,7 @@ impl ops::Sub<Self> for Tuple {
     }
 }
 
-impl ops::Neg for Tuple {
+impl<T> ops::Neg for Tuple<T> where T: Float {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -67,26 +68,26 @@ impl ops::Neg for Tuple {
     }
 }
 
-impl ops::Mul<f64> for Tuple {
+impl<T> ops::Mul<T> for Tuple<T> where T: Float {
     type Output = Self;
 
-    fn mul(self, other: f64) -> Self::Output {
+    fn mul(self, other: T) -> Self::Output {
         Tuple::new(self.x * other, self.y * other, self.z * other, self.w * other)
     }
 }
 
-impl ops::Div<f64> for Tuple {
+impl<T> ops::Div<T> for Tuple<T> where T: Float {
     type Output = Self;
 
-    fn div(self, other: f64) -> Self::Output {
+    fn div(self, other: T) -> Self::Output {
         Tuple::new(self.x / other, self.y / other, self.z / other, self.w / other)
     }
 }
 
 // Tuple maths operations
-impl Tuple {
+impl<T> Tuple<T> where T: Float {
     #[allow(dead_code)]
-    pub fn magnitude(&self) -> f64 {
+    pub fn magnitude(&self) -> T {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     } 
 
@@ -96,13 +97,13 @@ impl Tuple {
     }
 
     #[allow(dead_code)]
-    pub fn dot(&self, other: &Tuple) -> f64 {
+    pub fn dot(&self, other: &Tuple<T>) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
 
     #[allow(dead_code)]
-    pub fn cross(&self, other: &Tuple) -> Tuple {
+    pub fn cross(&self, other: &Tuple<T>) -> Tuple<T> {
         if !self.is_vector() || !other.is_vector() {
             panic!("Cross product can be calculated for two vectors");
         }

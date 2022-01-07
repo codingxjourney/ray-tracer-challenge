@@ -396,10 +396,10 @@ impl<T, const D: usize> Mul<Matrix<T, D>> for Matrix<T, D>
 }
 
 // @TODO: Generalize once Tuple has been refactored to use Float trait
-impl Mul<Tuple> for Matrix<f64, 4> where {
-    type Output = Tuple;
+impl<T> Mul<Tuple<T>> for Matrix<T, 4> where T: Float {
+    type Output = Tuple<T>;
 
-    fn mul(self, other: Tuple) -> Self::Output {
+    fn mul(self, other: Tuple<T>) -> Self::Output {
         Tuple::new(
             self[0][0] * other.x
                 + self[0][1] * other.y
