@@ -7,3 +7,4 @@ pub const EPSILON: f64 = 0.00001;
 pub mod tuple;
 pub mod canvas;
 pub mod matrix;
+pub mod ray;
