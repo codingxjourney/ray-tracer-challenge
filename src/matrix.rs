@@ -253,8 +253,7 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn translation(x: F, y: F, z: F) -> Matrix<4>
-  {
+  pub fn translation(x: F, y: F, z: F) -> Matrix<4> {
     Matrix::from([
       [1.0, 0.0, 0.0,   x],
       [0.0, 1.0, 0.0,   y],
@@ -264,8 +263,7 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn scaling(x: F, y: F, z: F) -> Matrix<4>
-  {
+  pub fn scaling(x: F, y: F, z: F) -> Matrix<4> {
     Matrix::from([
       [x,   0.0, 0.0, 0.0],
       [0.0,   y, 0.0, 0.0],
@@ -275,8 +273,7 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn rotation_x(r: F) -> Matrix<4>
-  {
+  pub fn rotation_x(r: F) -> Matrix<4> {
     Matrix::from([
       [1.0,     0.0,      0.0, 0.0],
       [0.0, r.cos(), -r.sin(), 0.0],
@@ -286,8 +283,8 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn rotation_y(r: F) -> Matrix<4>
-  {
+  // r is radiant
+  pub fn rotation_y(r: F) -> Matrix<4> {
     Matrix::from([
       [ r.cos(), 0.0, r.sin(), 0.0],
       [     0.0, 1.0,     0.0, 0.0],
@@ -297,8 +294,7 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn rotation_z(r: F) -> Matrix<4>
-  {
+  pub fn rotation_z(r: F) -> Matrix<4> {
     Matrix::from([
       [r.cos(), -r.sin(), 0.0, 0.0],
       [r.sin(),  r.cos(), 0.0, 0.0],
@@ -308,8 +304,7 @@ impl Matrix<4> {
   }
 
   #[rustfmt::skip]
-  pub fn shearing(xy: F, xz: F, yx: F, yz: F, zx: F, zy: F) -> Matrix<4>
-  {
+  pub fn shearing(xy: F, xz: F, yx: F, yz: F, zx: F, zy: F) -> Matrix<4> {
     Matrix::from([
       [1.0,  xy,  xz, 0.0],
       [ yx, 1.0,  yz, 0.0],
