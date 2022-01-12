@@ -8,3 +8,9 @@ edition = "2021"
 [dependencies]
 num-traits = "0.2.14"
 png = "0.17.2"
+
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false
+features = ["prepush-hook", "run-for-all", "run-cargo-test", "run-cargo-clippy"]
