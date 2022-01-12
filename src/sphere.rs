@@ -1,18 +1,11 @@
-use crate::F;
+use crate::intersections::*;
 use crate::ray::*;
 use crate::tuple::*;
 use crate::matrix::*;
+use crate::body::*;
 
-pub struct Intersection {
-    pub t: F,
-}
 
-impl Intersection {
-    pub fn new(t: F) -> Self {
-        Intersection { t }
-    }
-}
-
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sphere {
     transform: Matrix<4>,
 }
@@ -27,8 +20,10 @@ impl Sphere {
         }
         
     }
+}
 
-    pub fn intersect(&self, ray: Ray) -> Vec<Intersection> {
+impl Intersectable for Sphere {
+    fn intersect(&self, ray: Ray) -> Intersections {
         let object_space_ray = ray.transform(self.transform.inverse());
 
         let sphere_to_ray = object_space_ray.origin - Tuple::point(0.0, 0.0, 0.0);
@@ -40,12 +35,21 @@ impl Sphere {
         let descriminant = b.powi(2) - 4.0 * a * c;
 
         if descriminant < 0.0 {
-            vec![]
+            // vec![].into()
+            Intersections::new(vec![])
         } else {
             let t1 = (-b - descriminant.sqrt()) / (2.0 * a);
             let t2 = (-b + descriminant.sqrt()) / (2.0 * a);
             
-            vec![Intersection::new(t1), Intersection::new(t2)]
+            // vec![
+            //     Intersection::new(t1, Body::from(*self)), 
+            //     Intersection::new(t2, Body::from(*self))
+            // ].into()
+
+            Intersections::new(vec![
+                Intersection::new(t1, Body::from(*self)), 
+                Intersection::new(t2, Body::from(*self))
+            ])
         }
     }
 }
