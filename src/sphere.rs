@@ -52,12 +52,25 @@ impl Intersectable for Sphere {
             ])
         }
     }
+
+    fn normal_vector(&self, point: Tuple) -> Tuple {
+        let object_point = self.transform.inverse() * point;
+        let object_normal = (object_point - Tuple::point(0.0, 0.0, 0.0)).normalize();
+        let mut world_normal = self.transform.inverse().transpose() * object_normal;
+
+        // to wnsure we have a clean vector as due the inverse transpose the 
+        // w component could ve affected if the transformation matrix included a translation
+        world_normal.w = 0.0;
+        
+        world_normal.normalize()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{fuzzy_eq::*, tuple::Tuple};
+    use crate::{fuzzy_eq::*, tuple::Tuple, F};
+    use std::f64::consts::PI;
 
     #[test]
     fn ray_intersects_a_sphere_at_two_points() {
@@ -142,5 +155,94 @@ mod tests {
         assert_eq!(2, xs.len());
         assert_eq!(xs[0].t, 3.0);
         assert_eq!(xs[1].t, 7.0);
+    }
+
+    #[test]
+    fn the_normal_on_sphere_at_point_on_the_x_axis() {
+        let s = Sphere::new(None);
+        let n = s.normal_vector(Tuple::point(1.0, 0.0, 0.0));
+
+        let expected_result = Tuple::vector(1.0, 0.0, 0.0);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn the_normal_on_sphere_at_point_on_the_y_axis() {
+        let s = Sphere::new(None);
+        let n = s.normal_vector(Tuple::point(0.0, 1.0, 0.0));
+
+        let expected_result = Tuple::vector(0.0, 1.0, 0.0);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn the_normal_on_sphere_at_point_on_the_z_axis() {
+        let s = Sphere::new(None);
+        let n = s.normal_vector(Tuple::point(0.0, 0.0, 1.0));
+
+        let expected_result = Tuple::vector(0.0, 0.0, 1.0);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn the_normal_on_sphere_at_a_non_axial_point() {
+        let s = Sphere::new(None);
+        let sqrt3_over_3 = (3.0 as F).sqrt() / 3.0;
+
+        let p = Tuple::point(sqrt3_over_3, sqrt3_over_3, sqrt3_over_3);
+        let n = s.normal_vector(p);
+
+        let expected_result = Tuple::vector(sqrt3_over_3, sqrt3_over_3, sqrt3_over_3);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn computing_the_normal_on_a_translated_sphere() {
+        let s = Sphere::new(Some(Matrix::translation(0.0, 1.0, 0.0)));
+        
+        let p = Tuple::point(0.0, 1.70711, -0.70711);
+        let n = s.normal_vector(p);
+
+        let expected_result = Tuple::vector(0.0, 0.70711, -0.70711);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn computing_the_normal_on_a_scaled_and_rotated_sphere() {
+        let s = Sphere::new(Some(Matrix::scaling(1.0, 0.5, 1.0) * Matrix::rotation_z(PI / 5.0)));
+        let sqrt2_over_2 = (2.0 as F).sqrt() / 2.0;
+        let p = Tuple::point(0.0, sqrt2_over_2, -sqrt2_over_2);
+        let n = s.normal_vector(p);
+
+        let expected_result = Tuple::vector(0.0, 0.97014, -0.24254);
+
+        assert_fuzzy_eq!(n, expected_result);
+    }
+
+    #[test]
+    fn the_normal_vector_is_always_normalized() {
+        let s = Sphere::new(None);
+        let sqrt3_over_3 = (3.0 as F).sqrt() / 3.0;
+
+        let p = Tuple::point(sqrt3_over_3, sqrt3_over_3, sqrt3_over_3);
+        let n = s.normal_vector(p);
+
+        assert_fuzzy_eq!(n.normalize(), n);
+    }
+
+    #[test]
+    fn the_normal_vector_is_normalized_on_transformed_sphere() {
+        let s = Sphere::new(Some(Matrix::scaling(1.0, 0.5, 1.0) * Matrix::rotation_z(PI / 5.0)));
+        let sqrt2_over_2 = (2.0 as F).sqrt() / 2.0;
+        let p = Tuple::point(0.0, sqrt2_over_2, -sqrt2_over_2);
+        let n = s.normal_vector(p);
+
+
+        assert_fuzzy_eq!(n.normalize(), n);
     }
 }
