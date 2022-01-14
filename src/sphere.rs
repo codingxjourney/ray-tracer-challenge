@@ -23,6 +23,12 @@ impl Sphere {
         }
         
     }
+
+    pub fn with_material(material: Material, transform: Option<Matrix<4>>) -> Self {
+        let mut s = Self::new(transform);
+        s.material = material;
+        s
+    }
 }
 
 impl Intersectable for Sphere {
@@ -72,6 +78,7 @@ impl Intersectable for Sphere {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canvas::Color;
     use crate::fuzzy_eq::*;
     use crate::F;
     use crate::material::*;
@@ -255,6 +262,14 @@ mod tests {
     fn sphere_has_default_phong_material() {
         let s = Sphere::new(None);
         let m = Material::default();
+
+        assert_fuzzy_eq!(s.material, m);
+    }
+
+    #[test]
+    fn sphere_may_be_assigned_a_material() {
+        let m = Material::from(Phong::new(Color::new(1.0, 1.0, 0.0), 0.05, 0.7, 0.95, 400.0));
+        let s = Sphere::with_material(m, None);
 
         assert_fuzzy_eq!(s.material, m);
     }
