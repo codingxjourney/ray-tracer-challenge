@@ -1,4 +1,5 @@
 use crate::intersections::*;
+use crate::material::Material;
 use crate::ray::*;
 use crate::tuple::*;
 use crate::matrix::*;
@@ -8,6 +9,7 @@ use crate::body::*;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sphere {
     transform: Matrix<4>,
+    material: Material,
 }
 
 impl Sphere {
@@ -15,8 +17,9 @@ impl Sphere {
         match transform {
             None => Sphere {
                 transform: Matrix::identity(),
+                material: Material::default(),
             },
-            Some(transform) => Sphere { transform }
+            Some(transform) => Sphere { transform , material: Material::default() }
         }
         
     }
@@ -69,7 +72,9 @@ impl Intersectable for Sphere {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{fuzzy_eq::*, tuple::Tuple, F};
+    use crate::fuzzy_eq::*;
+    use crate::F;
+    use crate::material::*;
     use std::f64::consts::PI;
 
     #[test]
@@ -244,5 +249,13 @@ mod tests {
 
 
         assert_fuzzy_eq!(n.normalize(), n);
+    }
+
+    #[test]
+    fn sphere_has_default_phong_material() {
+        let s = Sphere::new(None);
+        let m = Material::default();
+
+        assert_fuzzy_eq!(s.material, m);
     }
 }
