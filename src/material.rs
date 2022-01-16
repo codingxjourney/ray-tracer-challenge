@@ -1,11 +1,17 @@
 use crate::canvas::Color;
-use crate::F;
 use crate::fuzzy_eq::*;
 use crate::light::PointLight;
 use crate::tuple::Tuple;
+use crate::F;
 
 pub trait Illuminated {
-    fn lighting(&self, light: PointLight, position: Tuple, eye_vec: Tuple, normal_vec: Tuple) -> Color;
+    fn lighting(
+        &self,
+        light: PointLight,
+        position: Tuple,
+        eye_vec: Tuple,
+        normal_vec: Tuple,
+    ) -> Color;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -26,20 +32,26 @@ impl Default for Material {
 }
 
 impl FuzzyEq<Material> for Material {
-  fn fuzzy_eq(&self, other: Material) -> bool {
-    match (self, other) {
-      (Material::Phong(ref phong), Material::Phong(other)) => phong.fuzzy_eq(other),
-      // Add default case (different types) to return false, once more than one
-      // Material exists
-      // _ => false,
+    fn fuzzy_eq(&self, other: Material) -> bool {
+        match (self, other) {
+            (Material::Phong(ref phong), Material::Phong(other)) => phong.fuzzy_eq(other),
+            // Add default case (different types) to return false, once more than one
+            // Material exists
+            // _ => false,
+        }
     }
-  }
 }
 
 impl Illuminated for Material {
-    fn lighting(&self, light: PointLight, position: Tuple, eye_vec: Tuple, normal_vec: Tuple) -> Color {
+    fn lighting(
+        &self,
+        light: PointLight,
+        position: Tuple,
+        eye_vec: Tuple,
+        normal_vec: Tuple,
+    ) -> Color {
         match *self {
-            Material::Phong(phong) => phong.lighting(light, position, eye_vec, normal_vec)
+            Material::Phong(phong) => phong.lighting(light, position, eye_vec, normal_vec),
         }
     }
 }
@@ -75,26 +87,39 @@ impl Phong {
             shininess,
         }
     }
+
+    pub fn with_color(color: Color) -> Self {
+        Phong {
+            color,
+            ..Self::default()
+        }
+    }
 }
 
 impl FuzzyEq<Phong> for Phong {
     fn fuzzy_eq(&self, other: Phong) -> bool {
-        self.color.fuzzy_eq(other.color) 
-            && self.ambient.fuzzy_eq(other.ambient) 
-            && self.diffuse.fuzzy_eq(other.diffuse) 
-            && self.specular.fuzzy_eq(other.specular) 
+        self.color.fuzzy_eq(other.color)
+            && self.ambient.fuzzy_eq(other.ambient)
+            && self.diffuse.fuzzy_eq(other.diffuse)
+            && self.specular.fuzzy_eq(other.specular)
             && self.shininess.fuzzy_eq(other.shininess)
     }
 }
 
 impl Illuminated for Phong {
-    fn lighting(&self, light: PointLight, position: Tuple, eye_vec: Tuple, normal_vec: Tuple) -> Color {
-        let ambient_light : Color;
+    fn lighting(
+        &self,
+        light: PointLight,
+        position: Tuple,
+        eye_vec: Tuple,
+        normal_vec: Tuple,
+    ) -> Color {
+        let ambient_light: Color;
         let diffuse_light: Color;
         let specular_light: Color;
 
         let effective_color = self.color * light.intensity;
-        
+
         let light_vec = (light.position - position).normalize();
 
         ambient_light = effective_color * self.ambient;
@@ -110,7 +135,7 @@ impl Illuminated for Phong {
             diffuse_light = effective_color * self.diffuse * light_dot_normal;
 
             let reflect_vec = -light_vec.reflect(normal_vec);
-            
+
             let reflect_dot_eye = reflect_vec.dot(eye_vec);
 
             if reflect_dot_eye <= 0.0 {
@@ -238,4 +263,4 @@ mod tests {
 
         assert_fuzzy_eq!(actual_result, expected_result);
     }
-    }
+}

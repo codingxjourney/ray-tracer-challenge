@@ -73,6 +73,10 @@ impl Intersectable for Sphere {
         
         world_normal.normalize()
     }
+
+    fn material(&self) -> Material {
+        self.material
+    }
 }
 
 #[cfg(test)]

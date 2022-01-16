@@ -1,3 +1,4 @@
+use crate::material::Material;
 use crate::ray::*;
 use crate::sphere::*;
 use crate::intersections::*;
@@ -7,6 +8,7 @@ use crate::tuple::*;
 pub trait Intersectable {
     fn intersect(&self, ray: Ray) -> Intersections;
     fn normal_vector(&self, point: Tuple) -> Tuple;
+    fn material(&self) -> Material;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -30,6 +32,12 @@ impl Intersectable for Body {
     fn normal_vector(&self, point: Tuple) -> Tuple {
         match *self {
             Body::Sphere(ref sphere) => sphere.normal_vector(point),
+        }
+    }
+
+    fn material(&self) -> Material {
+        match *self {
+            Body::Sphere(ref shpere) => shpere.material(),
         }
     }
 }
